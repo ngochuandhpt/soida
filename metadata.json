@@ -1,0 +1,7 @@
+{
+  "name": "Remix: Remix: soida.vn - Phân Tích Da Thông Minh",
+  "description": "Ứng dụng soi da và phân tích tình trạng da mặt sử dụng công nghệ AI giả lập, cung cấp các chỉ số về mụn, nếp nhăn và độ ẩm.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
