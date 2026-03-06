@@ -56,15 +56,21 @@ export const History: React.FC<HistoryProps> = ({ history, onBack, onSelectRecor
                     <Calendar className="w-3 h-3" />
                     {new Date(record.timestamp).toLocaleString('vi-VN')}
                   </div>
-                  <h4 className="font-bold text-slate-900">Loại da: {record.result.skinType}</h4>
+                  <h4 className="font-bold text-slate-900">
+                    Loại da: {typeof record.result.skinType === 'string' ? record.result.skinType : 
+                             record.result.skinType.type === 'da_dau' ? 'Da dầu' : 
+                             record.result.skinType.type === 'da_kho' ? 'Da khô' : 
+                             record.result.skinType.type === 'da_hon_hop' ? 'Da hỗn hợp' : 
+                             record.result.skinType.type === 'da_nhay_cam' ? 'Da nhạy cảm' : 'Da bình thường'}
+                  </h4>
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-24 bg-slate-100 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-emerald-500" 
-                        style={{ width: `${record.result.score}%` }}
+                        style={{ width: `${(record.result.healthScore?.score ?? record.result.score ?? 0)}%` }}
                       />
                     </div>
-                    <span className="text-xs font-bold text-emerald-600">{record.result.score} điểm</span>
+                    <span className="text-xs font-bold text-emerald-600">{(record.result.healthScore?.score ?? record.result.score ?? 0)} điểm</span>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors" />

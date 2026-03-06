@@ -123,10 +123,11 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
   };
 
   const chartData = [
-    { subject: 'Lão hóa', A: (10 - data.issues.overallAging) * 10, fullMark: 100 },
-    { subject: 'Mụn', A: (10 - data.issues.acne) * 10, fullMark: 100 },
-    { subject: 'Lỗ chân lông', A: (10 - data.issues.largePores) * 10, fullMark: 100 },
-    { subject: 'Sắc tố', A: (10 - data.issues.darkSpots) * 10, fullMark: 100 },
+    { subject: 'Lão hóa', A: (10 - data.skinIssues.aging) * 10, fullMark: 100 },
+    { subject: 'Mụn', A: (10 - data.skinIssues.acne) * 10, fullMark: 100 },
+    { subject: 'Sắc tố', A: (10 - data.skinIssues.pigmentation) * 10, fullMark: 100 },
+    { subject: 'Lỗ chân lông', A: (10 - data.skinIssues.largePores) * 10, fullMark: 100 },
+    { subject: 'Hàng rào', A: data.skinBarrier.score * 10, fullMark: 100 },
     { subject: 'Độ ẩm', A: data.overview.hydration * 10, fullMark: 100 },
   ];
 
@@ -186,13 +187,18 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
               <div className="grid grid-cols-2 gap-4 w-full">
                 <div className="bg-slate-50 p-4 rounded-2xl">
                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Loại da</p>
-                  <p className="text-sm font-bold text-emerald-600">{data.skinType}</p>
-                  <p className="text-[10px] text-slate-400">Độ tin cậy: {(data.skinTypeConfidence * 100).toFixed(0)}%</p>
+                  <p className="text-sm font-bold text-emerald-600">
+                    {data.skinType.type === 'da_dau' ? 'Da dầu' : 
+                     data.skinType.type === 'da_kho' ? 'Da khô' : 
+                     data.skinType.type === 'da_hon_hop' ? 'Da hỗn hợp' : 
+                     data.skinType.type === 'da_nhay_cam' ? 'Da nhạy cảm' : 'Da bình thường'}
+                  </p>
+                  <p className="text-[10px] text-slate-400">Độ tin cậy: {(data.skinType.confidence * 100).toFixed(0)}%</p>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl">
                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Tuổi da</p>
-                  <p className="text-sm font-bold text-emerald-600">{data.estimatedAge} tuổi</p>
-                  <p className="text-[10px] text-slate-400">Ước tính AI</p>
+                  <p className="text-sm font-bold text-emerald-600">{data.skinAge.age} tuổi</p>
+                  <p className="text-[10px] text-slate-400">{data.skinAge.comparison}</p>
                 </div>
               </div>
             </motion.div>
@@ -223,7 +229,12 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                   <OverviewItem label="Độ đều màu" value={data.overview.evenness} />
                   <OverviewItem label="Độ sáng" value={data.overview.brightness} />
                   <OverviewItem label="Độ ẩm" value={data.overview.hydration} />
-                  <OverviewItem label="Chất lượng bề mặt" value={data.overview.surfaceQuality} />
+                  <OverviewItem label="Độ mịn" value={data.overview.surfaceQuality} />
+                  <OverviewItem label="Độ đàn hồi" value={data.overview.elasticity} />
+                  <div className="col-span-2 bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
+                    <p className="text-[10px] font-bold text-emerald-600 uppercase mb-1">Nhận định chung</p>
+                    <p className="text-xs text-emerald-800 leading-tight">{data.overview.description}</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -242,12 +253,26 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                 Đánh giá các vấn đề da
               </h3>
               <div className="grid md:grid-cols-2 gap-x-10 gap-y-6">
-                <IssueItem label="Lão hóa tổng thể" value={data.issues.overallAging} />
-                <IssueItem label="Mụn" value={data.issues.acne} />
-                <IssueItem label="Mụn viêm đỏ" value={data.issues.redInflammation} />
-                <IssueItem label="Quầng thâm mắt" value={data.issues.darkCircles} />
-                <IssueItem label="Lỗ chân lông to" value={data.issues.largePores} />
-                <IssueItem label="Đốm thâm nám" value={data.issues.darkSpots} />
+                <IssueItem label="Mụn" value={data.skinIssues.acne} />
+                <IssueItem label="Mụn viêm" value={data.skinIssues.inflammatoryAcne} />
+                <IssueItem label="Lỗ chân lông to" value={data.skinIssues.largePores} />
+                <IssueItem label="Quầng thâm mắt" value={data.skinIssues.darkCircles} />
+                <IssueItem label="Da xỉn màu" value={data.skinIssues.dullness} />
+                <IssueItem label="Thâm sau mụn" value={data.skinIssues.postAcneSpots} />
+                <IssueItem label="Lão hóa" value={data.skinIssues.aging} />
+                <IssueItem label="Sắc tố" value={data.skinIssues.pigmentation} />
+                <IssueItem label="Đốm thâm" value={data.skinIssues.darkSpots} />
+                <IssueItem label="Nám" value={data.skinIssues.melasma} />
+              </div>
+              <div className="mt-8 p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                <p className="text-xs font-bold text-rose-600 uppercase mb-2">3 Vấn đề nổi bật nhất:</p>
+                <div className="flex flex-wrap gap-2">
+                  {data.skinIssues.topIssues.map((issue, i) => (
+                    <span key={i} className="px-3 py-1 bg-white text-rose-600 rounded-full text-xs font-bold border border-rose-200">
+                      {issue}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
 
@@ -264,7 +289,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-sm text-emerald-200">Nếp nhăn vùng mắt</span>
+                    <span className="text-sm text-emerald-200">Nếp nhăn mắt</span>
                     <span className="text-sm font-bold">{data.agingAnalysis.eyeWrinkles}%</span>
                   </div>
                   <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -273,11 +298,20 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-sm text-emerald-200">Nếp nhăn vùng má</span>
+                    <span className="text-sm text-emerald-200">Nếp nhăn má</span>
                     <span className="text-sm font-bold">{data.agingAnalysis.cheekWrinkles}%</span>
                   </div>
                   <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-400" style={{ width: `${data.agingAnalysis.cheekWrinkles}%` }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-emerald-200">Nếp nhăn trán</span>
+                    <span className="text-sm font-bold">{data.agingAnalysis.foreheadWrinkles}%</span>
+                  </div>
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-400" style={{ width: `${data.agingAnalysis.foreheadWrinkles}%` }} />
                   </div>
                 </div>
                 <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
@@ -287,6 +321,199 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                      data.agingAnalysis.wrinkleDepth === 'trung_binh' ? 'Trung bình' : 'Cao'}
                   </p>
                 </div>
+                <p className="text-xs text-emerald-100/70 italic">{data.agingAnalysis.description}</p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Pigmentation & Melasma Section */}
+          <div className="grid lg:grid-cols-3 gap-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100"
+            >
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Target className="w-5 h-5 text-indigo-500" />
+                Phân tích sắc tố
+              </h3>
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-2xl">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Melanin Index</p>
+                    <p className="text-xl font-black text-slate-900">{data.pigmentationAnalysis.melaninIndex}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-2xl">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Mật độ sắc tố</p>
+                    <p className="text-xl font-black text-slate-900">{data.pigmentationAnalysis.density}/10</p>
+                  </div>
+                </div>
+                <OverviewItem label="Sắc tố vi điểm" value={data.pigmentationAnalysis.microPigmentationIndex} />
+                <OverviewItem label="Độ không đều màu" value={data.pigmentationAnalysis.unevenness} />
+                <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                  <p className="text-xs text-indigo-800 leading-relaxed">
+                    <span className="font-bold">Giải thích vi điểm: </span>
+                    {data.pigmentationAnalysis.microPigmentationExplanation}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100"
+            >
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-amber-500" />
+                Bản đồ nhiệt sắc tố
+              </h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500">Vùng cao nhất:</span>
+                    <span className="font-bold text-slate-900">{data.pigmentationHeatmap.highestZones}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500">Vùng nguy cơ:</span>
+                    <span className="font-bold text-amber-600">{data.pigmentationHeatmap.riskZones}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500">Dấu hiệu tiền nám:</span>
+                    <span className="font-bold text-rose-600">{data.pigmentationHeatmap.preMelasmaSigns}</span>
+                  </div>
+                </div>
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-xs text-slate-600 leading-relaxed">{data.pigmentationHeatmap.explanation}</p>
+                </div>
+                <div className="pt-4 border-t border-slate-100">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 text-center">Phân bố melanin (%)</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <p className="text-[8px] text-slate-400 uppercase">Trán</p>
+                      <p className="text-xs font-bold">{data.pigmentationDistribution.forehead_center}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[8px] text-slate-400 uppercase">Má trái</p>
+                      <p className="text-xs font-bold">{data.pigmentationDistribution.cheek_left}%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[8px] text-slate-400 uppercase">Má phải</p>
+                      <p className="text-xs font-bold">{data.pigmentationDistribution.cheek_right}%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-rose-900 rounded-[2.5rem] p-8 text-white shadow-xl"
+            >
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-rose-400" />
+                Nguy cơ Nám
+              </h3>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-rose-300 mb-1">Cấp độ nguy cơ</p>
+                    <p className="text-2xl font-black capitalize">{data.melasmaRisk.level}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase font-bold text-rose-300 mb-1">Xác suất hiện tại</p>
+                    <p className="text-2xl font-black">{data.melasmaRisk.probability}%</p>
+                  </div>
+                </div>
+                
+                <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                  <p className="text-[10px] uppercase font-bold text-rose-300 mb-2">Dự đoán trong 24 tháng</p>
+                  <div className="flex items-end gap-2 mb-2">
+                    <span className="text-3xl font-black">{data.melasmaPrediction24Months.probability}%</span>
+                    <span className="text-xs font-bold text-rose-300 mb-1">Khả năng phát triển</span>
+                  </div>
+                  <p className="text-xs text-rose-100/80 leading-relaxed">{data.melasmaPrediction24Months.explanation}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase font-bold text-rose-300">Dấu hiệu tiền nám:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {data.melasmaRisk.preMelasmaIndicators.map((ind, i) => (
+                      <span key={i} className="px-2 py-1 bg-white/10 rounded-lg text-[10px] font-bold border border-white/10">
+                        {ind}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* UV & Barrier Section */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100"
+            >
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Sun className="w-5 h-5 text-amber-500" />
+                Tổn thương do ánh nắng
+              </h3>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="w-24 h-24 rounded-full border-4 border-amber-100 flex items-center justify-center mb-4">
+                    <span className="text-3xl font-black text-slate-900">{data.uvDamage.score}</span>
+                    <span className="text-xs font-bold text-slate-400">/10</span>
+                  </div>
+                  <p className="text-xs font-bold text-slate-400 uppercase">UV Damage Score</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    {data.uvDamage.signs.map((sign, i) => (
+                      <span key={i} className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold border border-amber-100">
+                        {sign}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">{data.uvDamage.explanation}</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100"
+            >
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                Hàng rào bảo vệ da
+              </h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <span className="text-2xl font-black">{data.skinBarrier.score}</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500" style={{ width: `${data.skinBarrier.score * 10}%` }} />
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-2">Skin Barrier Score</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-3 rounded-xl">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Giữ ẩm</p>
+                    <p className="text-xs font-bold text-slate-700">{data.skinBarrier.moistureRetention}</p>
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-xl">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Độ nhạy cảm</p>
+                    <p className="text-xs font-bold text-slate-700">{data.skinBarrier.sensitivity}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 italic">Dấu hiệu suy yếu: {data.skinBarrier.weaknessSigns}</p>
               </div>
             </motion.div>
           </div>
@@ -325,7 +552,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                   </div>
                   <h4 className="text-lg font-bold text-amber-900">Routine Sáng</h4>
                 </div>
-                <p className="text-amber-800/80 leading-relaxed">{data.careSuggestions.morningRoutine}</p>
+                <p className="text-amber-800/80 leading-relaxed text-sm whitespace-pre-line">{data.skincareRecommendations.topical.morningRoutine}</p>
               </div>
               <div className="bg-indigo-50 rounded-3xl p-6 border border-indigo-100">
                 <div className="flex items-center gap-3 mb-4">
@@ -334,30 +561,51 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                   </div>
                   <h4 className="text-lg font-bold text-indigo-900">Routine Tối</h4>
                 </div>
-                <p className="text-indigo-800/80 leading-relaxed">{data.careSuggestions.nightRoutine}</p>
+                <p className="text-indigo-800/80 leading-relaxed text-sm whitespace-pre-line">{data.skincareRecommendations.topical.nightRoutine}</p>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-emerald-50 rounded-3xl p-6 border border-emerald-100">
                 <h4 className="font-bold text-emerald-900 mb-4 flex items-center gap-2">
                   <Zap className="w-4 h-4" />
                   Hoạt chất phù hợp
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {data.careSuggestions.suitableActives.map((active, i) => (
-                    <span key={i} className="px-3 py-1 bg-white border border-emerald-200 text-emerald-700 rounded-full text-xs font-bold">
+                  {data.skincareRecommendations.topical.suggestedActives.map((active, i) => (
+                    <span key={i} className="px-3 py-1 bg-white border border-emerald-200 text-emerald-700 rounded-full text-[10px] font-bold">
                       {active}
                     </span>
                   ))}
                 </div>
               </div>
+              <div className="bg-purple-50 rounded-3xl p-6 border border-purple-100">
+                <h4 className="font-bold text-purple-900 mb-4 flex items-center gap-2">
+                  <Droplets className="w-4 h-4" />
+                  Bổ sung bên trong
+                </h4>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {data.skincareRecommendations.internal.supplements.map((sup, i) => (
+                    <span key={i} className="px-2 py-1 bg-white border border-purple-200 text-purple-700 rounded-lg text-[10px] font-bold">
+                      {sup}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-purple-600 leading-tight">{data.skincareRecommendations.internal.roles}</p>
+              </div>
               <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
                 <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <Info className="w-4 h-4" />
-                  Lưu ý quan trọng
+                  Lối sống hỗ trợ
                 </h4>
-                <p className="text-sm text-slate-600 leading-relaxed">{data.careSuggestions.notes}</p>
+                <ul className="space-y-1">
+                  {data.skincareRecommendations.lifestyle.tips.map((tip, i) => (
+                    <li key={i} className="text-[10px] text-slate-600 flex items-start gap-2">
+                      <div className="w-1 h-1 rounded-full bg-slate-400 mt-1.5 shrink-0" />
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </motion.div>
@@ -385,7 +633,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onReset, onConsultation 
                 </div>
                 <div>
                   <p className="font-bold text-emerald-400">Quà tặng dành riêng cho bạn!</p>
-                  <p className="text-sm text-slate-400 max-w-md">Bạn nhận được 1 vé tư vấn miễn phí trực tiếp về da và quy trình chăm sóc da chuyên sâu từ chuyên gia.</p>
+                  <p className="text-sm text-slate-400 max-w-md">Bạn nhận được 1 vé tư vấn miễn phí trực tiếp về da và quy trình chăm sóc da chuyên sâu cho da Nám từ chuyên gia.</p>
                 </div>
               </div>
               <div className="flex flex-wrap justify-center gap-4">

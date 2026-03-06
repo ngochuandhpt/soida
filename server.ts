@@ -86,13 +86,17 @@ async function startServer() {
       stmt.run(id, phoneNumber, timestamp, imageUrl, JSON.stringify(result), consultationRequested ? 1 : 0);
       
       // Push to Google Sheets
+      const score = result.healthScore?.score ?? result.score ?? 0;
+      const skinType = typeof result.skinType === 'string' ? result.skinType : result.skinType?.type;
+      const topIssue = result.skinIssues?.topIssues?.[0] ?? result.primaryConcern ?? 'N/A';
+
       await appendToSheet([
         timestamp,
         phoneNumber,
         'Skin Scan',
-        result.overallScore,
-        result.skinType,
-        result.primaryConcern,
+        score,
+        skinType,
+        topIssue,
         consultationRequested ? 'Yes' : 'No',
         id
       ]);

@@ -403,7 +403,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                       </td>
                       <td className="px-6 py-5">
                         <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">
-                          {scan.result.skinType}
+                          {typeof scan.result.skinType === 'string' ? scan.result.skinType : 
+                           scan.result.skinType.type === 'da_dau' ? 'Da dầu' : 
+                           scan.result.skinType.type === 'da_kho' ? 'Da khô' : 
+                           scan.result.skinType.type === 'da_hon_hop' ? 'Da hỗn hợp' : 
+                           scan.result.skinType.type === 'da_nhay_cam' ? 'Da nhạy cảm' : 'Da bình thường'}
                         </span>
                       </td>
                       <td className="px-6 py-5">
@@ -538,7 +542,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Lần soi #{userHistory.length - idx}</span>
                           <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold uppercase">
-                            {historyItem.result.skinType}
+                            {typeof historyItem.result.skinType === 'string' ? historyItem.result.skinType : 
+                             historyItem.result.skinType.type === 'da_dau' ? 'Da dầu' : 
+                             historyItem.result.skinType.type === 'da_kho' ? 'Da khô' : 
+                             historyItem.result.skinType.type === 'da_hon_hop' ? 'Da hỗn hợp' : 
+                             historyItem.result.skinType.type === 'da_nhay_cam' ? 'Da nhạy cảm' : 'Da bình thường'}
                           </span>
                         </div>
                         <div className="text-sm font-medium text-slate-500 flex items-center gap-1">
@@ -554,7 +562,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                         </div>
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                           <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Tuổi ước tính</div>
-                          <div className="text-lg font-bold text-slate-900">{historyItem.result.estimatedAge}</div>
+                          <div className="text-lg font-bold text-slate-900">{historyItem.result.skinAge?.age ?? historyItem.result.estimatedAge}</div>
                         </div>
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                           <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Độ ẩm</div>
@@ -562,7 +570,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                         </div>
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                           <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Mụn</div>
-                          <div className="text-lg font-bold text-slate-900">{historyItem.result.issues.acne}/10</div>
+                          <div className="text-lg font-bold text-slate-900">{(historyItem.result.skinIssues?.acne ?? historyItem.result.issues?.acne)}/10</div>
                         </div>
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                           <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Tư vấn</div>
@@ -581,19 +589,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
                               <span className="text-slate-500">Lỗ chân lông:</span>
-                              <span className="font-bold text-slate-700">{historyItem.result.issues.largePores}/10</span>
+                              <span className="font-bold text-slate-700">{(historyItem.result.skinIssues?.largePores ?? historyItem.result.issues?.largePores)}/10</span>
                             </div>
                             <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
                               <span className="text-slate-500">Sắc tố/Nám:</span>
-                              <span className="font-bold text-slate-700">{historyItem.result.issues.darkSpots}/10</span>
+                              <span className="font-bold text-slate-700">{(historyItem.result.skinIssues?.melasma ?? historyItem.result.issues?.darkSpots)}/10</span>
                             </div>
                             <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
                               <span className="text-slate-500">Quầng thâm:</span>
-                              <span className="font-bold text-slate-700">{historyItem.result.issues.darkCircles}/10</span>
+                              <span className="font-bold text-slate-700">{(historyItem.result.skinIssues?.darkCircles ?? historyItem.result.issues?.darkCircles)}/10</span>
                             </div>
                             <div className="flex justify-between p-2 bg-slate-50 rounded-lg">
                               <span className="text-slate-500">Lão hóa:</span>
-                              <span className="font-bold text-slate-700">{historyItem.result.issues.overallAging}/10</span>
+                              <span className="font-bold text-slate-700">{(historyItem.result.skinIssues?.aging ?? historyItem.result.issues?.overallAging)}/10</span>
                             </div>
                           </div>
                         </div>
@@ -606,11 +614,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                           <div className="space-y-2 text-xs">
                             <div className="p-2 bg-emerald-50/50 border border-emerald-100 rounded-lg">
                               <span className="font-bold text-emerald-700 block mb-1">Sáng:</span>
-                              <p className="text-slate-600">{historyItem.result.careSuggestions.morningRoutine}</p>
+                              <p className="text-slate-600">{(historyItem.result.skincareRecommendations?.topical?.morningRoutine ?? historyItem.result.careSuggestions?.morningRoutine)}</p>
                             </div>
                             <div className="p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg">
                               <span className="font-bold text-indigo-700 block mb-1">Tối:</span>
-                              <p className="text-slate-600">{historyItem.result.careSuggestions.nightRoutine}</p>
+                              <p className="text-slate-600">{(historyItem.result.skincareRecommendations?.topical?.nightRoutine ?? historyItem.result.careSuggestions?.nightRoutine)}</p>
                             </div>
                           </div>
                         </div>

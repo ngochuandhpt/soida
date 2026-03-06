@@ -45,7 +45,7 @@ export const ConsultationPopup: React.FC<ConsultationPopupProps> = ({ isOpen, on
               </h3>
               
               <p className="text-slate-500 mb-8 leading-relaxed">
-                Bạn nhận được 1 vé tư vấn miễn phí trực tiếp về da và quy trình chăm sóc da chuyên sâu, bạn có muốn nhận không?
+                Bạn nhận được 1 vé tư vấn miễn phí trực tiếp về da và quy trình chăm sóc da chuyên sâu cho da Nám, bạn có muốn nhận không?
               </p>
 
               <div className="grid grid-cols-2 gap-4">

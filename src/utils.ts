@@ -1,47 +1,120 @@
 import { SkinAnalysisResult } from './types';
 
 export const generateMockAnalysis = (): SkinAnalysisResult => {
-  const skinTypes = ['Da Dầu', 'Da Khô', 'Da Hỗn Hợp', 'Da Thường'];
-  
   return {
     overview: {
-      evenness: Math.floor(Math.random() * 3) + 7,
-      brightness: Math.floor(Math.random() * 3) + 7,
-      hydration: Math.floor(Math.random() * 3) + 7,
-      surfaceQuality: Math.floor(Math.random() * 3) + 7,
+      evenness: 8,
+      brightness: 7,
+      hydration: 8,
+      surfaceQuality: 9,
+      elasticity: 8,
+      description: "Làn da có độ đàn hồi tốt và bề mặt mịn màng."
     },
-    skinType: skinTypes[Math.floor(Math.random() * skinTypes.length)],
-    skinTypeConfidence: 0.85 + Math.random() * 0.1,
-    score: Math.floor(Math.random() * 20) + 75,
-    estimatedAge: 25 + Math.floor(Math.random() * 10),
+    skinType: {
+      type: 'da_hon_hop',
+      confidence: 0.92,
+      explanation: "Vùng chữ T có dấu hiệu tiết dầu nhẹ trong khi hai bên má bình thường."
+    },
+    healthScore: {
+      score: 85,
+      explanation: "Da khỏe mạnh, cần duy trì quy trình chăm sóc hiện tại."
+    },
+    skinAge: {
+      age: 28,
+      comparison: "Trẻ hơn tuổi thật",
+      explanation: "Các dấu hiệu lão hóa chưa xuất hiện rõ rệt."
+    },
+    pigmentationAge: {
+      age: 30,
+      comparison: "Tương đương tuổi thật",
+      explanation: "Sắc tố da ổn định."
+    },
     agingAnalysis: {
-      eyeWrinkles: Math.floor(Math.random() * 15),
-      cheekWrinkles: Math.floor(Math.random() * 10),
+      eyeWrinkles: 5,
+      cheekWrinkles: 2,
+      foreheadWrinkles: 3,
       wrinkleDepth: 'thap',
+      description: "Nếp nhăn mờ, chủ yếu là nếp nhăn cảm xúc."
     },
-    issues: {
-      overallAging: Math.floor(Math.random() * 3),
-      acne: Math.floor(Math.random() * 4),
-      redInflammation: Math.floor(Math.random() * 2),
-      darkCircles: Math.floor(Math.random() * 5),
-      largePores: Math.floor(Math.random() * 4),
-      darkSpots: Math.floor(Math.random() * 3),
+    skinIssues: {
+      acne: 2,
+      inflammatoryAcne: 1,
+      largePores: 4,
+      darkCircles: 3,
+      dullness: 2,
+      postAcneSpots: 3,
+      aging: 2,
+      pigmentation: 3,
+      darkSpots: 2,
+      melasma: 1,
+      topIssues: ["Lỗ chân lông", "Thâm sau mụn", "Quầng thâm"]
     },
-    careSuggestions: {
-      morningRoutine: 'Rửa mặt -> Toner -> Serum Vitamin C -> Kem dưỡng -> Kem chống nắng',
-      nightRoutine: 'Tẩy trang -> Rửa mặt -> Toner -> Retinol -> Kem dưỡng đêm',
-      suitableActives: ['Niacinamide', 'Vitamin C', 'Hyaluronic Acid'],
-      notes: 'Hãy luôn sử dụng kem chống nắng vào ban ngày.',
+    pigmentationAnalysis: {
+      melaninIndex: 35,
+      density: 3,
+      microPigmentationIndex: 2,
+      unevenness: 3,
+      microPigmentationExplanation: "Sắc tố vi điểm ở mức thấp, chưa có dấu hiệu tích tụ melanin sâu."
     },
-    detailedConclusion: 'Da của bạn đang ở trạng thái khá tốt, tuy nhiên cần chú ý cấp ẩm thường xuyên hơn.',
+    pigmentationDistribution: {
+      forehead_left: 20,
+      forehead_center: 25,
+      forehead_right: 20,
+      cheek_left: 35,
+      cheek_right: 35,
+      nose: 40,
+      chin: 30
+    },
+    pigmentationHeatmap: {
+      highestZones: "Gò má",
+      riskZones: "Hai bên má",
+      preMelasmaSigns: "Không rõ rệt",
+      explanation: "Sắc tố tập trung nhẹ ở vùng gò má do tiếp xúc ánh nắng."
+    },
+    uvDamage: {
+      score: 3,
+      signs: ["Sạm nhẹ"],
+      explanation: "Tổn thương UV ở mức thấp nhưng cần duy trì chống nắng."
+    },
+    skinBarrier: {
+      score: 8,
+      moistureRetention: "Tốt",
+      sensitivity: "Thấp",
+      weaknessSigns: "Không có"
+    },
+    melasmaRisk: {
+      score: 20,
+      level: 'thap',
+      preMelasmaIndicators: ["Sắc tố lan tỏa nhẹ"],
+      probability: 15
+    },
+    melasmaPrediction24Months: {
+      probability: 25,
+      level: 'thap',
+      explanation: "Nguy cơ thấp nếu duy trì bảo vệ da tốt."
+    },
+    skincareRecommendations: {
+      topical: {
+        morningRoutine: "Sữa rửa mặt -> Vitamin C -> Kem dưỡng -> Chống nắng",
+        nightRoutine: "Tẩy trang -> Sữa rửa mặt -> Retinol -> Kem dưỡng phục hồi",
+        suggestedActives: ["Vitamin C", "Retinol", "Niacinamide"]
+      },
+      internal: {
+        supplements: ["Collagen", "Vitamin C"],
+        roles: "Hỗ trợ sáng da và chống lão hóa"
+      },
+      lifestyle: {
+        tips: ["Ngủ đủ giấc", "Uống 2L nước mỗi ngày"]
+      }
+    },
+    aiConclusion: {
+      summary: "Da hỗn hợp thiên dầu nhẹ, tình trạng chung rất tốt.",
+      links: "Độ ẩm tốt giúp hàng rào bảo vệ da vững chắc.",
+      futureRisks: "Nguy cơ lão hóa thấp trong 2 năm tới.",
+      overallAdvice: "Tiếp tục quy trình hiện tại và chú ý chống nắng kỹ."
+    },
     timestamp: new Date().toLocaleString('vi-VN'),
-    metrics: {
-      acne: 20,
-      wrinkles: 15,
-      pores: 30,
-      pigmentation: 25,
-      hydration: 70,
-    },
-    recommendations: ['Sử dụng kem chống nắng', 'Uống nhiều nước']
+    score: 85,
+    detailedConclusion: "Da của bạn đang ở trạng thái khá tốt."
   };
 };
