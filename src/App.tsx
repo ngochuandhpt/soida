@@ -42,10 +42,21 @@ export default function App() {
     }
   }, [userPhone]);
 
-  const handleLogin = (phone: string) => {
+  const handleLogin = async (phone: string) => {
     setUserPhone(phone);
     localStorage.setItem('userPhone', phone);
     setState('home');
+    
+    // Capture lead on server
+    try {
+      await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: phone }),
+      });
+    } catch (err) {
+      console.error("Failed to capture lead on server:", err);
+    }
   };
 
   const handleLogout = () => {

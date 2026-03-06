@@ -1,11 +1,51 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
-import db from "./src/services/db.js"; // Note: using .js for ESM compatibility in some environments, but tsx handles .ts
+import db from "./src/services/db.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { google } from "googleapis";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Google Sheets Helper
+async function appendToSheet(data: any[]) {
+  const authEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const authKey = process.env.GOOGLE_PRIVATE_KEY;
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  const range = process.env.GOOGLE_SHEET_NAME || 'Sheet1';
+
+  if (!authEmail || !authKey || !spreadsheetId) {
+    console.warn("Google Sheets credentials not fully configured. Skipping sheet update.");
+    return;
+  }
+
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: authEmail,
+        private_key: authKey.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [data],
+      },
+    });
+    console.log("Successfully appended to Google Sheet");
+  } catch (error) {
+    console.error("Error appending to Google Sheet:", error);
+  }
+}
 
 async function startServer() {
   const app = express();
@@ -15,8 +55,28 @@ async function startServer() {
 
   // API Routes
   
+  // Login/Lead capture
+  app.post("/api/login", async (req, res) => {
+    const { phoneNumber } = req.body;
+    const timestamp = new Date().toISOString();
+    console.log(`User logged in: ${phoneNumber}`);
+    
+    // Push to Google Sheets immediately as a lead
+    await appendToSheet([
+      timestamp,
+      phoneNumber,
+      'Login Only',
+      '', // Score
+      '', // Skin Type
+      '', // Primary Concern
+      'No' // Consultation
+    ]);
+    
+    res.json({ success: true });
+  });
+
   // Save scan result
-  app.post("/api/scans", (req, res) => {
+  app.post("/api/scans", async (req, res) => {
     const { id, phoneNumber, timestamp, imageUrl, result, consultationRequested } = req.body;
     try {
       const stmt = db.prepare(`
@@ -24,6 +84,19 @@ async function startServer() {
         VALUES (?, ?, ?, ?, ?, ?)
       `);
       stmt.run(id, phoneNumber, timestamp, imageUrl, JSON.stringify(result), consultationRequested ? 1 : 0);
+      
+      // Push to Google Sheets
+      await appendToSheet([
+        timestamp,
+        phoneNumber,
+        'Skin Scan',
+        result.overallScore,
+        result.skinType,
+        result.primaryConcern,
+        consultationRequested ? 'Yes' : 'No',
+        id
+      ]);
+
       res.json({ success: true });
     } catch (error) {
       console.error("Error saving scan:", error);
@@ -32,7 +105,7 @@ async function startServer() {
   });
 
   // Update consultation status
-  app.post("/api/scans/consultation", (req, res) => {
+  app.post("/api/scans/consultation", async (req, res) => {
     const { timestamp, phoneNumber, requested } = req.body;
     try {
       const stmt = db.prepare(`
@@ -40,6 +113,21 @@ async function startServer() {
         WHERE phoneNumber = ? AND timestamp = ?
       `);
       stmt.run(requested ? 1 : 0, phoneNumber, timestamp);
+      
+      if (requested) {
+        // Push to Google Sheets as a consultation request
+        await appendToSheet([
+          new Date().toISOString(),
+          phoneNumber,
+          'Consultation Requested',
+          '', // Score
+          '', // Skin Type
+          '', // Primary Concern
+          'Yes',
+          `Update for scan at ${timestamp}`
+        ]);
+      }
+
       res.json({ success: true });
     } catch (error) {
       console.error("Error updating consultation:", error);
